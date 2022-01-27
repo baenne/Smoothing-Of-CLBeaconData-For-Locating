@@ -16,9 +16,9 @@ This projects goal was to programm a class which handles incoming beacon data, s
 
 1. Initialise the BeaconLocationManager either in your view or while initializing the app. The ranging starts with initialization of the class.
 
-´´´
+```
 @ObservedObject var location: BeaconLocationManager = BeaconLocationManager()
-´´´
+```
 
 2. Afterwards you can subscribe to one of the following publishers
 
@@ -35,7 +35,7 @@ smoothedBeaconData: Sends a single array with the closest CLBeacons ordered by a
 resulting from the smoothing of the data.
 ```
 
-Alternatively you can use the specific function **getSmoothedBeaconDataForAllAvailableBeacons** to get the values only when you want them to which returns the ordered CLBeacon array.
+1. Alternatively you can use the specific function **getSmoothedBeaconDataForAllAvailableBeacons** to get the values only when you want them to which returns the ordered CLBeacon array.
 ```
 func getSmoothedBeaconDataForAllAvailableBeacons(smoothedData: [CLBeacon]) -> [CLBeacon]? 
 ```
