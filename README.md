@@ -1,4 +1,4 @@
-# Smoothing-Of-CLBeaconData-For-Locating
+# Smoothing of CLBeaconData for Locating of CLBeacons
 Welcome to my gitproject. I´m Baenne(Benedikt) and work with Swift for around a year now.
 
 ## Introduction
@@ -6,6 +6,7 @@ This projects goal was to programm a class which handles incoming beacon data, s
 
 ## Requirements
 
+- iBeacon-certified hardware
 - xCode 12 or higher
 - CoreLocation
 - Combine
