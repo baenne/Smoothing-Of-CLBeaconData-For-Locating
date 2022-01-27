@@ -36,7 +36,7 @@ struct BeaconView: View {
 		// Raw data
 		Text("\(String(describing:location.beaconData))")
 		// Last 10 rangings sorted by beacon
-		Text("\(String(describing:location.savedBeacons))")
+		Text("\(String(describing:location.sortedBeaconData))")
 		//Smoothed beacon data
 		Text("\(String(describing:location.smoothedBeaconData))")
 	}
