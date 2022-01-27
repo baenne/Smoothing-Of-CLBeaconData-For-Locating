@@ -33,11 +33,13 @@ and an array with the last 7 ranged values for this specific beacon.
 ```
 smoothedBeaconData: Sends a single array with the closest CLBeacons ordered by accuracy 
 resulting from the smoothing of the data.
+```
 
-
-Alternatively you can use the specific function to get the values only when you want them to which returns the ordered CLBeacon array.
+Alternatively you can use the specific function **getSmoothedBeaconDataForAllAvailableBeacons** to get the values only when you want them to which returns the ordered CLBeacon array.
 ```
 func getSmoothedBeaconDataForAllAvailableBeacons(smoothedData: [CLBeacon]) -> [CLBeacon]? 
 ```
 
+
+## End
 
