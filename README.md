@@ -17,7 +17,7 @@ This projects goal was to programm a class which handles incoming beacon data, s
 1. Initialise the BeaconLocationManager either in your view or while initializing the app. The ranging starts with initialization of the class.
 
 ```
-@ObservedObject var location: BeaconLocationManager = BeaconLocationManager()
+@ObservedObject var beaconManager: BeaconLocationManager = BeaconLocationManager()
 ```
 
 2. Afterwards you can subscribe to one of the following publishers
