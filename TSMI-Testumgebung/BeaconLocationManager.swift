@@ -15,8 +15,9 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	var locationManager: CLLocationManager?
 	
 	@Published var beaconData = [CLBeacon]()
-	@Published var sortedBeaconData = [BeaconId: [CLBeacon]]()
+	@Published var orderedByBeaconBeaconData = [BeaconId: [CLBeacon]]()
 	@Published var smoothedBeaconData = [CLBeacon]()
+	@Published var smoothedAndSortedBeaconData : [CLBeacon]? = [CLBeacon]()
 	
 	private var cancellable: AnyCancellable?
 	private var cancellable2: AnyCancellable?
@@ -30,37 +31,37 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 		locationManager?.delegate = self
 		
 		cancellable = _beaconData.projectedValue.sink(receiveValue: { beaconData in
-			self.sortBeaconDataForAllAvailableBeacons(beacons: beaconData)
+			self.orderBeaconDataByBeaconForAllAvailableBeacons(beacons: beaconData)
 		})
-		cancellable2 = _sortedBeaconData.projectedValue.sink(receiveValue: { sortedBeaconData in
-			self.smoothBeaconDataForAllAvailableBeacons(from: sortedBeaconData)
+		cancellable2 = _orderedByBeaconBeaconData.projectedValue.sink(receiveValue: { orderedByBeaconBeaconData in
+			self.smoothBeaconDataForAllAvailableBeacons(from: orderedByBeaconBeaconData)
 		})
 		cancellable3 = _smoothedBeaconData.projectedValue.sink(receiveValue: { smoothedBeaconData in
-			self.getSmoothedBeaconDataForAllAvailableBeacons(smoothedData: smoothedBeaconData)
+			self.sortSmoothedBeaconData(smoothedData: smoothedBeaconData)
 		})
 		
 		startSearching()
 	}
 	
-	func sortBeaconDataForAllAvailableBeacons(beacons: [CLBeacon]) -> Void {
+	func orderBeaconDataByBeaconForAllAvailableBeacons(beacons: [CLBeacon]) -> Void {
 		// Creates a dictonary with a custom struct which uses the uuid, major and minor of the specific beacon as the keys and/or adds the ranged data into the values array with the matching key
 		beacons.forEach {
 			beacon in
 			let beaconKey = BeaconId(uuid: beacon.uuid, major: Int(beacon.major), minor: Int(beacon.minor))
-			if sortedBeaconData[beaconKey] != nil {
-				if sortedBeaconData[beaconKey]!.count >= 10 {
-					sortedBeaconData[beaconKey]!.remove(at: 0)
-					sortedBeaconData[beaconKey]!.append(beacon)
+			if orderedByBeaconBeaconData[beaconKey] != nil {
+				if orderedByBeaconBeaconData[beaconKey]!.count >= 10 {
+					orderedByBeaconBeaconData[beaconKey]!.remove(at: 0)
+					orderedByBeaconBeaconData[beaconKey]!.append(beacon)
 				} else {
-					sortedBeaconData[beaconKey]?.append(beacon)
+					orderedByBeaconBeaconData[beaconKey]?.append(beacon)
 				}
 			} else {
-				sortedBeaconData.updateValue([beacon], forKey: beaconKey)
+				orderedByBeaconBeaconData.updateValue([beacon], forKey: beaconKey)
 			}
 		}
 	}
 	
-	func smoothBeaconDataForAllAvailableBeacons(from dict: [BeaconId:[CLBeacon]]){
+	func smoothBeaconDataForAllAvailableBeacons(from dict: [BeaconId:[CLBeacon]]) {
 		// Save resulting array with newest BeaconData for each available beacon to smoothedBeaconData-Publisher
 		smoothedBeaconData = dict.filter{
 			// Remove all key-value pairs from the dictionary which did not get ranged in the last 20 seconds
@@ -79,18 +80,18 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 				// Create new array with all nil values removed and only the newest entry of each Beacon
 				$0.value.last(where: { $0.proximity != .unknown})
 			}
-			.sorted{
-				// Sorts the resulting CLBeacon array in order of closest accuracy
-				$0.accuracy < $1.accuracy
-			}
 	}
 	
-	func getSmoothedBeaconDataForAllAvailableBeacons(smoothedData: [CLBeacon]) -> [CLBeacon]? {
+	func sortSmoothedBeaconData(smoothedData: [CLBeacon]) {
 		// Checks if smoothed data array is empty. If yes returns nil. Otherwise returns the array
 		if smoothedData.isEmpty {
-			return nil
+			smoothedAndSortedBeaconData = nil
 		} else {
-			return smoothedData
+			smoothedAndSortedBeaconData = smoothedData.sorted{
+				// Sorts the resulting CLBeacon array in order of closest proximity and after that closest accuracy
+				($0.proximity.rawValue,$0.accuracy) <
+					($1.proximity.rawValue, $1.accuracy)
+			}
 		}
 	}
 	
