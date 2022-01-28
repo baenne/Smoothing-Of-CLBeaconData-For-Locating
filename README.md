@@ -27,7 +27,7 @@ This projects goal was to programm a class which handles incoming beacon data, s
 `beaconData`: Sends the raw data after each ranging (roughly every second).
 
 
-`orderedByBeaconBeaconData`: Sends the beacondata sorted as a dictionary 
+`orderedByBeaconBeaconData`: Sends the beacon data sorted as a dictionary 
 with a custom struct(BeaconId(uuid,major,minor)) as the key 
 and an array with the last 7 ranged values for this specific beacon.
 
