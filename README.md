@@ -41,7 +41,7 @@ sortedAndSmoothedBeaconData: Sends a single array with the closest CLBeacons ord
 
 Alternatively you can use the specific function **getSmoothedBeaconDataForAllAvailableBeacons** to get the values only when you want them to which returns the  ordered CLBeacon array.
 ```
-func getSmoothedBeaconDataForAllAvailableBeacons(smoothedData: [CLBeacon]) -> [CLBeacon]? 
+func sortSmoothedBeaconData(smoothedData: [CLBeacon]) -> [CLBeacon]? 
 ```
 
 
