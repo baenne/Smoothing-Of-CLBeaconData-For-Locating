@@ -23,7 +23,7 @@ struct ContentView: View {
 
 // View which starts the ranging and displays the raw/sorted/smoothed data
 struct BeaconView: View {
-	@ObservedObject var location: BeaconLocationManager = BeaconLocationManager()
+	@ObservedObject var beaconManager: BeaconLocationManager = BeaconLocationManager(uuidForRanging: UUID(uuidString: "5A4BCFCE-174E-4BAC-A814-092E77F6B7E5")!)
 	@Binding var showBeaconView: Bool
 	var body: some View {
 		HStack {
@@ -34,11 +34,11 @@ struct BeaconView: View {
 			Spacer()
 		}
 		// Raw data
-		Text("\(String(describing:location.beaconData))")
+		Text("\(String(describing:beaconManager.beaconData))")
 		// Last 10 rangings sorted by beacon
-		Text("\(String(describing:location.orderedByBeaconBeaconData))")
+		Text("\(String(describing:beaconManager.orderedByBeaconBeaconData))")
 		//Smoothed beacon data
-		Text("\(String(describing:location.smoothedBeaconData))")
+		Text("\(String(describing:beaconManager.smoothedBeaconData))")
 	}
 }
 
