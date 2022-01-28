@@ -23,9 +23,9 @@ This projects goal was to programm a class which handles incoming beacon data, s
 
 2. Afterwards you can subscribe to one of the following publishers
 
-```
-beaconData: Sends the raw data after each ranging (roughly every second).
-```
+
+`beaconData:` Sends the raw data after each ranging (roughly every second).
+
 ```
 orderedByBeaconBeaconData: Sends the beacondata sorted as a dictionary 
 with a custom struct(BeaconId(uuid,major,minor)) as the key 
