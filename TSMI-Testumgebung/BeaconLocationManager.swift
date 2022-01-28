@@ -13,6 +13,7 @@ import SwiftUI
 class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 	
 	var locationManager: CLLocationManager?
+	let uuidForRanging: UUID
 	
 	@Published var beaconData = [CLBeacon]()
 	@Published var orderedByBeaconBeaconData = [BeaconId: [CLBeacon]]()
@@ -23,8 +24,8 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	private var cancellable2: AnyCancellable?
 	private var cancellable3: AnyCancellable?
 	
-	override init() {
-		
+	init(uuidForRanging: UUID = UUID(uuidString: "5A4BCFCE-174E-4BAC-A814-092E77F6B7E5")!) {
+		self.uuidForRanging = uuidForRanging
 		super.init()
 		
 		locationManager = CLLocationManager()
@@ -97,9 +98,7 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	
 	func startSearching() {
 		// Starts searching for Beacons in the vincinity with the hardcoded uuid.
-		let uuid = UUID(uuidString: "5A4BCFCE-174E-4BAC-A814-092E77F6B7E5")
-		let constraint = CLBeaconIdentityConstraint(uuid: uuid!)
-		
+		let constraint = CLBeaconIdentityConstraint(uuid: uuidForRanging)
 		locationManager?.startRangingBeacons(satisfying: constraint)
 	}
 }
