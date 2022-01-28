@@ -32,16 +32,21 @@ with a custom struct(BeaconId(uuid,major,minor)) as the key
 and an array with the last 7 ranged values for this specific beacon.
 ```
 ```
-smoothedBeaconData: Sends a single array with the closest CLBeacons 
-resulting from the smoothing of the data.
+smoothedBeaconData: Sends the smoothed dictionary.
+Removed: beacons which last ranged more than 10 seconds ago, beacons with less than 7 value entries 
+and beacons which have 4 or more .unknown proximities in their last 7 ranges.
 ```
 ```
-sortedAndSmoothedBeaconData: Sends a single array with the closest CLBeacons ordered by proximity and accuracy
+reducedAndSmoothedBeaconData: Sends a single array with the newest ranged data from each remaining beacon.
+```
+```
+finalSmoothedBeaconData: Sends a single array with the closest CLBeacons ordered by proximity and accuracy.
 ```
 
-Alternatively you can use the specific function **getSmoothedBeaconDataForAllAvailableBeacons** to get the values only when you want them to which returns the  ordered CLBeacon array.
+Alternatively you can use the specific function **sortSmoothedAndReducedBeaconData** to get the values only when you want them to 
+which returns the  ordered CLBeacon array.
 ```
-func sortSmoothedBeaconData(smoothedData: [CLBeacon]) -> [CLBeacon]? 
+func sortSmoothedAndReducedBeaconData(smoothedData: [CLBeacon]) -> [CLBeacon]? 
 ```
 
 
