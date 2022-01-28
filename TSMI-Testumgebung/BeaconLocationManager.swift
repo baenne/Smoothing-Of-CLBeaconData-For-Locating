@@ -17,12 +17,14 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	
 	@Published var beaconData = [CLBeacon]()
 	@Published var orderedByBeaconBeaconData = [BeaconId: [CLBeacon]]()
-	@Published var smoothedBeaconData = [CLBeacon]()
-	@Published var smoothedAndSortedBeaconData : [CLBeacon]? = [CLBeacon]()
+	@Published var smoothedBeaconData = [BeaconId: [CLBeacon]]()
+	@Published var reducedAndSmoothedBeaconData = [CLBeacon]()
+	@Published var finalSmoothedBeaconData : [CLBeacon]? = [CLBeacon]()
 	
 	private var cancellable: AnyCancellable?
 	private var cancellable2: AnyCancellable?
 	private var cancellable3: AnyCancellable?
+	private var cancellable4: AnyCancellable?
 	
 	init(uuidForRanging: UUID = UUID(uuidString: "5A4BCFCE-174E-4BAC-A814-092E77F6B7E5")!) {
 		self.uuidForRanging = uuidForRanging
@@ -38,7 +40,10 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 			self.smoothBeaconDataForAllAvailableBeacons(from: orderedByBeaconBeaconData)
 		})
 		cancellable3 = _smoothedBeaconData.projectedValue.sink(receiveValue: { smoothedBeaconData in
-			self.sortSmoothedBeaconData(smoothedData: smoothedBeaconData)
+			self.reduceSmoothedBeaconData(smoothedBeaconData: smoothedBeaconData)
+		})
+		cancellable4 = _reducedAndSmoothedBeaconData.projectedValue.sink(receiveValue: { reducedAndSmoothedBeaconData in
+			self.sortSmoothedAndReducedBeaconData(reducedAndSmoothedBeaconData: reducedAndSmoothedBeaconData)
 		})
 		
 		startSearching()
@@ -65,30 +70,33 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	func smoothBeaconDataForAllAvailableBeacons(from dict: [BeaconId:[CLBeacon]]) {
 		// Save resulting array with newest BeaconData for each available beacon to smoothedBeaconData-Publisher
 		smoothedBeaconData = dict.filter{
-			// Remove all key-value pairs from the dictionary which did not get ranged in the last 20 seconds
+			// Remove all key-value pairs from the dictionary which did not get ranged in the last 10 seconds
 			$0.value.last!.timestamp >= Date.now - 10
 			
-			// Remove all key-value pairs from the dictionary which have less than 10 entries
+			// Remove all key-value pairs from the dictionary which have less than 7 entries
 			&& $0.value.count > 6
 			
-			// Remove all key-value pairs from the dictionary which have 6 or more .unknown proximities in their value array
+			// Remove all key-value pairs from the dictionary which have 4 or more .unknown proximities in their value array
 			&& $0.value.filter
 			   { (beacon:CLBeacon)-> Bool in
 				   return beacon.proximity == .unknown}
 			   .count < 4
 			}
-			.compactMap{
-				// Create new array with all nil values removed and only the newest entry of each Beacon
-				$0.value.last(where: { $0.proximity != .unknown})
-			}
 	}
 	
-	func sortSmoothedBeaconData(smoothedData: [CLBeacon]) {
+	func reduceSmoothedBeaconData(smoothedBeaconData: [BeaconId: [CLBeacon]]) {
+		reducedAndSmoothedBeaconData = smoothedBeaconData.compactMap{
+			// Create new array with all nil values removed and only the newest entry of each Beacon
+			   $0.value.last(where: { $0.proximity != .unknown})
+		   }
+	}
+	
+	func sortSmoothedAndReducedBeaconData(reducedAndSmoothedBeaconData: [CLBeacon]) {
 		// Checks if smoothed data array is empty. If yes returns nil. Otherwise returns the array
-		if smoothedData.isEmpty {
-			smoothedAndSortedBeaconData = nil
+		if reducedAndSmoothedBeaconData.isEmpty {
+			finalSmoothedBeaconData = nil
 		} else {
-			smoothedAndSortedBeaconData = smoothedData.sorted{
+			finalSmoothedBeaconData = reducedAndSmoothedBeaconData.sorted{
 				// Sorts the resulting CLBeacon array in order of closest proximity and after that closest accuracy
 				($0.proximity.rawValue,$0.accuracy) <
 					($1.proximity.rawValue, $1.accuracy)
