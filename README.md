@@ -24,24 +24,20 @@ This projects goal was to programm a class which handles incoming beacon data, s
 2. Afterwards you can subscribe to one of the following publishers
 
 
-`beaconData:` Sends the raw data after each ranging (roughly every second).
+`beaconData`: Sends the raw data after each ranging (roughly every second).
 
-```
-orderedByBeaconBeaconData: Sends the beacondata sorted as a dictionary 
+
+`orderedByBeaconBeaconData`: Sends the beacondata sorted as a dictionary 
 with a custom struct(BeaconId(uuid,major,minor)) as the key 
 and an array with the last 7 ranged values for this specific beacon.
-```
-```
-smoothedBeaconData: Sends the smoothed dictionary.
+
+`smoothedBeaconData`: Sends the smoothed dictionary.
 Removed: beacons which last ranged more than 10 seconds ago, beacons with less than 7 value entries 
 and beacons which have 4 or more .unknown proximities in their last 7 ranges.
-```
-```
-reducedAndSmoothedBeaconData: Sends a single array with the newest ranged data from each remaining beacon.
-```
-```
-finalSmoothedBeaconData: Sends a single array with the closest CLBeacons ordered by proximity and accuracy.
-```
+
+`reducedAndSmoothedBeaconData`: Sends a single array with the newest ranged data from each remaining beacon.
+
+`finalSmoothedBeaconData`: Sends a single array with the closest CLBeacons ordered by proximity and accuracy.
 
 Alternatively you can use the specific function **sortSmoothedAndReducedBeaconData** to get the values only when you want them to 
 which returns the  ordered CLBeacon array.
