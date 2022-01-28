@@ -16,10 +16,10 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	let uuidForRanging: UUID
 	
 	@Published var beaconData = [CLBeacon]()
-	@Published var orderedByBeaconBeaconData = [BeaconId: [CLBeacon]]()
-	@Published var smoothedBeaconData = [BeaconId: [CLBeacon]]()
-	@Published var reducedAndSmoothedBeaconData = [CLBeacon]()
-	@Published var finalSmoothedBeaconData : [CLBeacon]? = [CLBeacon]()
+	@Published var orderedByBeaconData = [BeaconId: [CLBeacon]]()
+	@Published var smoothedData = [BeaconId: [CLBeacon]]()
+	@Published var reducedAndSmoothedData = [CLBeacon]()
+	@Published var finalSmoothedData : [CLBeacon]? = [CLBeacon]()
 	
 	private var cancellable: AnyCancellable?
 	private var cancellable2: AnyCancellable?
@@ -36,14 +36,14 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 		cancellable = _beaconData.projectedValue.sink(receiveValue: { beaconData in
 			self.orderBeaconDataByBeaconForAllAvailableBeacons(beacons: beaconData)
 		})
-		cancellable2 = _orderedByBeaconBeaconData.projectedValue.sink(receiveValue: { orderedByBeaconBeaconData in
-			self.smoothBeaconDataForAllAvailableBeacons(from: orderedByBeaconBeaconData)
+		cancellable2 = _orderedByBeaconData.projectedValue.sink(receiveValue: { orderedByBeaconData in
+			self.smoothBeaconDataForAllAvailableBeacons(from: orderedByBeaconData)
 		})
-		cancellable3 = _smoothedBeaconData.projectedValue.sink(receiveValue: { smoothedBeaconData in
-			self.reduceSmoothedBeaconData(smoothedBeaconData: smoothedBeaconData)
+		cancellable3 = _smoothedData.projectedValue.sink(receiveValue: { smoothedData in
+			self.reduceSmoothedBeaconData(smoothedData: smoothedData)
 		})
-		cancellable4 = _reducedAndSmoothedBeaconData.projectedValue.sink(receiveValue: { reducedAndSmoothedBeaconData in
-			self.sortSmoothedAndReducedBeaconData(reducedAndSmoothedBeaconData: reducedAndSmoothedBeaconData)
+		cancellable4 = _reducedAndSmoothedData.projectedValue.sink(receiveValue: { reducedAndSmoothedData in
+			self.sortSmoothedAndReducedBeaconData(reducedAndSmoothedData: reducedAndSmoothedData)
 		})
 		
 		startSearching()
@@ -54,22 +54,22 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 		beacons.forEach {
 			beacon in
 			let beaconKey = BeaconId(uuid: beacon.uuid, major: Int(beacon.major), minor: Int(beacon.minor))
-			if orderedByBeaconBeaconData[beaconKey] != nil {
-				if orderedByBeaconBeaconData[beaconKey]!.count >= 10 {
-					orderedByBeaconBeaconData[beaconKey]!.remove(at: 0)
-					orderedByBeaconBeaconData[beaconKey]!.append(beacon)
+			if orderedByBeaconData[beaconKey] != nil {
+				if orderedByBeaconData[beaconKey]!.count >= 10 {
+					orderedByBeaconData[beaconKey]!.remove(at: 0)
+					orderedByBeaconData[beaconKey]!.append(beacon)
 				} else {
-					orderedByBeaconBeaconData[beaconKey]?.append(beacon)
+					orderedByBeaconData[beaconKey]?.append(beacon)
 				}
 			} else {
-				orderedByBeaconBeaconData.updateValue([beacon], forKey: beaconKey)
+				orderedByBeaconData.updateValue([beacon], forKey: beaconKey)
 			}
 		}
 	}
 	
 	func smoothBeaconDataForAllAvailableBeacons(from dict: [BeaconId:[CLBeacon]]) {
-		// Save resulting array with newest BeaconData for each available beacon to smoothedBeaconData-Publisher
-		smoothedBeaconData = dict.filter{
+		// Save resulting array with newest BeaconData for each available beacon to smoothedData-Publisher
+		smoothedData = dict.filter{
 			// Remove all key-value pairs from the dictionary which did not get ranged in the last 10 seconds
 			$0.value.last!.timestamp >= Date.now - 10
 			
@@ -84,19 +84,19 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 			}
 	}
 	
-	func reduceSmoothedBeaconData(smoothedBeaconData: [BeaconId: [CLBeacon]]) {
-		reducedAndSmoothedBeaconData = smoothedBeaconData.compactMap{
+	func reduceSmoothedBeaconData(smoothedData: [BeaconId: [CLBeacon]]) {
+		reducedAndSmoothedData = smoothedData.compactMap{
 			// Create new array with all nil values removed and only the newest entry of each Beacon
 			   $0.value.last(where: { $0.proximity != .unknown})
 		   }
 	}
 	
-	func sortSmoothedAndReducedBeaconData(reducedAndSmoothedBeaconData: [CLBeacon]) {
+	func sortSmoothedAndReducedBeaconData(reducedAndSmoothedData: [CLBeacon]) {
 		// Checks if smoothed data array is empty. If yes returns nil. Otherwise returns the array
-		if reducedAndSmoothedBeaconData.isEmpty {
-			finalSmoothedBeaconData = nil
+		if reducedAndSmoothedData.isEmpty {
+			finalSmoothedData = nil
 		} else {
-			finalSmoothedBeaconData = reducedAndSmoothedBeaconData.sorted{
+			finalSmoothedData = reducedAndSmoothedData.sorted{
 				// Sorts the resulting CLBeacon array in order of closest proximity and after that closest accuracy
 				($0.proximity.rawValue,$0.accuracy) <
 					($1.proximity.rawValue, $1.accuracy)
@@ -105,7 +105,7 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 	}
 	
 	func getFinalData() -> [CLBeacon]?{
-		return finalSmoothedBeaconData
+		return finalSmoothedData
 	}
 	
 	func startSearching() {
