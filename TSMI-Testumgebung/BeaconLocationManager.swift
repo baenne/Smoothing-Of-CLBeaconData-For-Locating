@@ -104,6 +104,10 @@ class BeaconLocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 		}
 	}
 	
+	func getFinalData() -> [CLBeacon]?{
+		return finalSmoothedBeaconData
+	}
+	
 	func startSearching() {
 		// Starts searching for Beacons in the vincinity with the hardcoded uuid.
 		let constraint = CLBeaconIdentityConstraint(uuid: uuidForRanging)
