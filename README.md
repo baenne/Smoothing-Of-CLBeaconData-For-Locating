@@ -7,7 +7,7 @@ This projects goal was to programm a class which handles incoming beacon data, s
 ## Requirements
 
 - iBeacon-certified hardware
-- xCode 12 or higher
+- XCode 12 or higher
 - CoreLocation
 - Combine
 - Foundation
