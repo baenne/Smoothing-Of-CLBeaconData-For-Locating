@@ -39,10 +39,10 @@ and beacons which have 4 or more .unknown proximities in their last 7 ranges.
 
 `finalSmoothedBeaconData`: Sends a single array with the closest CLBeacons ordered by proximity and accuracy.
 
-Alternatively you can use the specific function **sortSmoothedAndReducedBeaconData** to get the values only when you want them to 
-which returns the  ordered CLBeacon array.
+Alternatively you can use the specific function **getFinalData()** to get the values only when you want them to 
+which returns the  ordered optional CLBeacon array.If not enough data is available the function returns nil
 ```
-func sortSmoothedAndReducedBeaconData(smoothedData: [CLBeacon]) -> [CLBeacon]? 
+func getFinalData() -> [CLBeacon]? 
 ```
 
 
