@@ -35,10 +35,14 @@ struct BeaconView: View {
 		}
 		// Raw data
 		Text("\(String(describing:beaconManager.beaconData))")
-		// Last 10 rangings sorted by beacon
-		Text("\(String(describing:beaconManager.orderedByBeaconBeaconData))")
-		//Smoothed beacon data
-		Text("\(String(describing:beaconManager.smoothedBeaconData))")
+		// Last 10 rangings sorted by beacon as a dict
+		Text("\(String(describing:beaconManager.orderedByBeaconData))")
+		//Smoothed beacon data as a dict
+		Text("\(String(describing:beaconManager.smoothedData))")
+		//reduced Array with single beacons
+		Text("\(String(describing:beaconManager.reducedAndSmoothedData))")
+		//Final data sorted by proximity and accuracy
+		Text("\(String(describing:beaconManager.finalSmoothedData))")
 	}
 }
 
